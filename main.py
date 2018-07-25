@@ -7,8 +7,9 @@ class EMTAN():
         self.operation = 'process_stats'
 
     def process_stats(self):
-        csv_file = './data/stats.txt'
-        utils.preprocess_stats(csv_file)
+        original_file = './data/train.csv'
+        csv_file = './data/train_set.csv'
+        utils.preprocess_stats(original_file, csv_file)
 
 def main():
     net = EMTAN()
