@@ -20,3 +20,48 @@ def change_stat_to_int(attribute):
     elif attribute == 'neg':
         attribute = 2
     return attribute
+
+def stats_distribution(csv):
+    lines = np.loadtxt(csv, dtype='str')
+    first_neu = 0
+    first_pos = 0
+    first_neg = 0
+    second_neu = 0
+    second_pos = 0
+    second_neg = 0
+    third_neu = 0
+    third_pos = 0
+    third_neg = 0
+    for line in lines:
+        first = line[1]
+        if first == '0':
+            first_neu += 1
+        elif first == '1':
+            first_pos += 1
+        else:
+            first_neg += 1
+
+        second = line[2]
+        if second == '0':
+            second_neu += 1
+        elif second == '1':
+            second_pos += 1
+        else:
+            second_neg += 1
+
+        third = line[3]
+        if third == '0':
+            third_neu += 1
+        elif third == '1':
+            third_pos += 1
+        else:
+            third_neg += 1
+    print('first_neu:', first_neu)
+    print('first_pos:', first_pos)
+    print('first_neg:', first_neg)
+    print('second_neu:', second_neu)
+    print('second_pos:', second_pos)
+    print('second_neg:', second_neg)
+    print('third_neu:', third_neu)
+    print('third_pos:', third_pos)
+    print('third_neg:', third_neg)
