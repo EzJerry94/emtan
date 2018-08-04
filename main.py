@@ -12,9 +12,24 @@ from evaluation import Evaluation
 class EMTAN():
 
     def __init__(self):
+        # operation parameter
         self.operation = 'process_stats'
-        self.train_tfrecords_folder = './data/arousal_train_set.tfrecords'
-        self.validate_tfrecords_folder = './data/devel_set.tfrecords'
+        # data source parameters
+        self.arousal_train_tfrecords = './data/arousal_train_set.tfrecords'
+        self.arousal_validate_tfrecords = './data/arousal_train_set.tfrecords'
+        self.arousal_test_tfrecords = './data/arousal_train_set.tfrecords'
+        self.valence_train_tfrecords = './data/arousal_train_set.tfrecords'
+        self.valence_validate_tfrecords = './data/arousal_train_set.tfrecords'
+        self.valence_test_tfrecords = './data/arousal_train_set.tfrecords'
+        self.dominance_train_tfrecords = './data/arousal_train_set.tfrecords'
+        self.dominance_validate_tfrecords = './data/arousal_train_set.tfrecords'
+        self.dominance_test_tfrecords = './data/arousal_train_set.tfrecords'
+        # train parameters
+        self.is_multi = True
+        self.is_arousal = False
+        self.is_valence = False
+        self.is_dominance = False
+        # model parameters
         self.batch_size = 4
         self.epochs = 2
         self.num_classes = 3
