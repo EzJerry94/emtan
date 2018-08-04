@@ -13,7 +13,7 @@ class EMTAN():
 
     def __init__(self):
         # operation parameter
-        self.operation = 'process_stats'
+        self.operation = 'show_stats_distribution'
         # data source parameters
         self.arousal_train_tfrecords = './data/arousal_train_set.tfrecords'
         self.arousal_validate_tfrecords = './data/arousal_train_set.tfrecords'
@@ -58,9 +58,32 @@ class EMTAN():
         generator = Generator()
         generator.write_tfrecords()
 
-    def get_data_provider(self):
-        self.train_data_provider = DataProvider(self.train_tfrecords_folder, self.batch_size, True)
-        self.validate_data_provider = DataProvider(self.validate_tfrecords_folder, self.batch_size, False)
+    def get_arousal_train_data_provider(self):
+        self.arousal_train_data_provider = DataProvider(self.arousal_train_tfrecords, self.batch_size, True)
+
+    def get_arousal_validate_data_provider(self):
+        self.arousal_validate_data_provider = DataProvider(self.arousal_validate_tfrecords, self.batch_size, False)
+
+    def get_arousal_test_data_provider(self):
+        self.arousal_test_data_provider = DataProvider(self.arousal_test_tfrecords, self.batch_size, False)
+
+    def get_valence_train_data_provider(self):
+        self.valence_train_data_provider = DataProvider(self.valence_train_tfrecords, self.batch_size, True)
+
+    def get_valence_validate_data_provider(self):
+        self.valence_validate_data_provider = DataProvider(self.valence_validate_tfrecords, self.batch_size, False)
+
+    def get_valence_test_data_provider(self):
+        self.valence_test_data_provider = DataProvider(self.valence_test_tfrecords, self.batch_size, False)
+
+    def get_dominance_train_data_provider(self):
+        self.dominance_train_data_provider = DataProvider(self.dominance_train_tfrecords, self.batch_size, True)
+
+    def get_dominance_validate_data_provider(self):
+        self.dominance_validate_data_provider = DataProvider(self.dominance_validate_tfrecords, self.batch_size, False)
+
+    def get_dominance_test_data_provider(self):
+        self.dominance_test_data_provider = DataProvider(self.dominance_test_tfrecords, self.batch_size, False)
 
     def training(self):
         predictions = self.get_predictions
@@ -95,8 +118,9 @@ class EMTAN():
 def main():
     net = EMTAN()
     if net.operation == 'process_stats':
-        #net.process_stats()
-        utils.stats_distribution('./data/train_set.csv')
+        net.process_stats()
+    elif net.operation == 'show_stats_distribution':
+        utils.stats_distribution('./data/raw/train_set.csv')
     elif net.operation == 'generate':
         net.tfrecords_generate()
     elif net.operation == 'training':
