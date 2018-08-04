@@ -1,17 +1,21 @@
 import tensorflow as tf
 import numpy as np
 import copy
+import random
 from moviepy.editor import AudioFileClip
 
 
 class Generator:
 
     def __init__(self):
-        self.csv = 'data/train_set.csv'
+        self.csv = 'data/raw/train_set.csv'
         self.upsample = True
         self.classes = 3
-        self.tfrecords_file = 'data/arousal_train_set.tfrecords'
+        self.tfrecords_file = 'data/arousal/multi_train_set.tfrecords'
         self.attribute = 'arousal'
+        self.num_arousal_after_upsample = 9051
+        self.num_valence_after_upsample = 14022
+        self.num_dominance_after_upsample = 12393
 
     def _int_feature(self, value):
         return tf.train.Feature(int64_list=tf.train.Int64List(value=[value]))
@@ -63,6 +67,34 @@ class Generator:
 
         return augmented_data
 
+    def multi_sample_num_same(self, data, diff):
+        each_class = diff // 3
+        neu_index = [] # 0
+        pos_index = [] # 1
+        neg_index = [] # 2
+        for item in data.keys():
+            if data[item]['label'] == 0:
+                neu_index.append(item)
+            elif data[item]['label'] == 1:
+                pos_index.append(item)
+            else:
+                neg_index.append(item)
+
+        random.seed(3)
+        neu_add_index = random.sample(neu_index, each_class)
+        pos_add_index = random.sample(pos_index, each_class)
+        neg_add_index = random.sample(neg_index, each_class)
+        for index in neu_add_index:
+            data[index + '_' + 'multi'] = {'file': data[index]['file'],
+                                           'label': data[index]['label']}
+        for index in pos_add_index:
+            data[index + '_' + 'multi'] = {'file': data[index]['file'],
+                                           'label': data[index]['label']}
+        for index in neg_add_index:
+            data[index + '_' + 'multi'] = {'file': data[index]['file'],
+                                           'label': data[index]['label']}
+        return data
+
     def write_tfrecords(self):
         self.read_csv(self.csv, self.attribute)
         self.dict_files = dict()
@@ -72,6 +104,13 @@ class Generator:
                                        }
         if self.upsample:
             self.dict_files = self.upsample_process(self.dict_files)
+
+        if self.attribute == 'arousal':
+            self.dict_files = self.multi_sample_num_same(self.dict_files,
+                                                         self.num_valence_after_upsample - self.num_arousal_after_upsample)
+        if self.attribute == 'dominance':
+            self.dict_files = self.multi_sample_num_same(self.dict_files,
+                                                         self.num_valence_after_upsample - self.num_dominance_after_upsample)
 
         print('\n Start generating tfrecords \n')
 
