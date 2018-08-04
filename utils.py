@@ -56,12 +56,12 @@ def stats_distribution(csv):
             third_pos += 1
         else:
             third_neg += 1
-    print('first_neu:', first_neu)
-    print('first_pos:', first_pos)
-    print('first_neg:', first_neg)
-    print('second_neu:', second_neu)
-    print('second_pos:', second_pos)
-    print('second_neg:', second_neg)
-    print('third_neu:', third_neu)
-    print('third_pos:', third_pos)
-    print('third_neg:', third_neg)
+    print('arousal_neu:', first_neu)
+    print('arousal_pos:', first_pos)
+    print('arousal_neg:', first_neg)
+    print('valence_neu:', second_neu)
+    print('valence_pos:', second_pos)
+    print('valence_neg:', second_neg)
+    print('dominance_neu:', third_neu)
+    print('dominance_pos:', third_pos)
+    print('dominance_neg:', third_neg)

@@ -12,10 +12,10 @@ from evaluation import Evaluation
 class EMTAN():
 
     def __init__(self):
-        self.operation = 'training'
+        self.operation = 'process_stats'
         self.train_tfrecords_folder = './data/arousal_train_set.tfrecords'
         self.validate_tfrecords_folder = './data/devel_set.tfrecords'
-        self.batch_size = 2
+        self.batch_size = 4
         self.epochs = 2
         self.num_classes = 3
         self.learning_rate = 1e-4
@@ -31,12 +31,12 @@ class EMTAN():
     def _reshape_to_rnn(self, frames):
         batch_size, num_features = frames.get_shape().as_list()
         seq_length = -1
-        frames = tf.reshape(frames, [2, seq_length, num_features])
+        frames = tf.reshape(frames, [self.batch_size, seq_length, num_features])
         return frames
 
     def process_stats(self):
-        original_file = './data/train.csv'
-        csv_file = './data/train_set.csv'
+        original_file = './data/validation.csv'
+        csv_file = './data/validation_set.csv'
         utils.preprocess_stats(original_file, csv_file)
 
     def tfrecords_generate(self):
