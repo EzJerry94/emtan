@@ -105,10 +105,10 @@ class Generator:
         if self.upsample:
             self.dict_files = self.upsample_process(self.dict_files)
 
-        if self.attribute == 'arousal':
+        if self.attribute == 'arousal' and self.upsample:
             self.dict_files = self.multi_sample_num_same(self.dict_files,
                                                          self.num_valence_after_upsample - self.num_arousal_after_upsample)
-        if self.attribute == 'dominance':
+        if self.attribute == 'dominance' and self.upsample:
             self.dict_files = self.multi_sample_num_same(self.dict_files,
                                                          self.num_valence_after_upsample - self.num_dominance_after_upsample)
 
