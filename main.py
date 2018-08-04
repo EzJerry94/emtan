@@ -13,7 +13,7 @@ class EMTAN():
 
     def __init__(self):
         # operation parameter
-        self.operation = 'show_stats_distribution'
+        self.operation = 'generate'
         # data source parameters
         self.arousal_train_tfrecords = './data/arousal_train_set.tfrecords'
         self.arousal_validate_tfrecords = './data/arousal_train_set.tfrecords'
@@ -34,7 +34,7 @@ class EMTAN():
         self.epochs = 2
         self.num_classes = 3
         self.learning_rate = 1e-4
-        self.is_attention = False
+        self.is_attention = True
 
     def _reshape_to_conv(self, frames):
         frame_shape = frames.get_shape().as_list()
@@ -91,6 +91,12 @@ class EMTAN():
                       self.num_classes, self.learning_rate, predictions)
         train.start_training()
 
+    def multi_task_training(self):
+        pass
+
+    def single_task_training(self):
+        pass
+
     def get_predictions(self, frames):
         frames = self._reshape_to_conv(frames)
         cnn = CNN()
@@ -124,8 +130,10 @@ def main():
     elif net.operation == 'generate':
         net.tfrecords_generate()
     elif net.operation == 'training':
-        net.get_data_provider()
-        net.training()
+        if net.is_multi:
+            net.multi_task_training()
+        else:
+            net.single_task_training()
 
 if __name__ == '__main__':
     main()
