@@ -56,34 +56,7 @@ class EMTAN():
 
     def tfrecords_generate(self):
         generator = Generator()
-        generator.write_tfrecords()
-
-    def get_arousal_train_data_provider(self):
-        self.arousal_train_data_provider = DataProvider(self.arousal_train_tfrecords, self.batch_size, True)
-
-    def get_arousal_validate_data_provider(self):
-        self.arousal_validate_data_provider = DataProvider(self.arousal_validate_tfrecords, self.batch_size, False)
-
-    def get_arousal_test_data_provider(self):
-        self.arousal_test_data_provider = DataProvider(self.arousal_test_tfrecords, self.batch_size, False)
-
-    def get_valence_train_data_provider(self):
-        self.valence_train_data_provider = DataProvider(self.valence_train_tfrecords, self.batch_size, True)
-
-    def get_valence_validate_data_provider(self):
-        self.valence_validate_data_provider = DataProvider(self.valence_validate_tfrecords, self.batch_size, False)
-
-    def get_valence_test_data_provider(self):
-        self.valence_test_data_provider = DataProvider(self.valence_test_tfrecords, self.batch_size, False)
-
-    def get_dominance_train_data_provider(self):
-        self.dominance_train_data_provider = DataProvider(self.dominance_train_tfrecords, self.batch_size, True)
-
-    def get_dominance_validate_data_provider(self):
-        self.dominance_validate_data_provider = DataProvider(self.dominance_validate_tfrecords, self.batch_size, False)
-
-    def get_dominance_test_data_provider(self):
-        self.dominance_test_data_provider = DataProvider(self.dominance_test_tfrecords, self.batch_size, False)
+        generator.write_multi_tfrecords()
 
     def training(self):
         predictions = self.get_predictions

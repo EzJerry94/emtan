@@ -65,3 +65,47 @@ def stats_distribution(csv):
     print('dominance_neu:', third_neu)
     print('dominance_pos:', third_pos)
     print('dominance_neg:', third_neg)
+
+def upsample_stats_distribution(dict):
+    first_neu = 0
+    first_pos = 0
+    first_neg = 0
+    second_neu = 0
+    second_pos = 0
+    second_neg = 0
+    third_neu = 0
+    third_pos = 0
+    third_neg = 0
+    for line in dict.keys():
+        first = dict[line]['arousal']
+        if first == 0:
+            first_neu += 1
+        elif first == 1:
+            first_pos += 1
+        else:
+            first_neg += 1
+
+        second = dict[line]['valence']
+        if second == 0:
+            second_neu += 1
+        elif second == 1:
+            second_pos += 1
+        else:
+            second_neg += 1
+
+        third = dict[line]['dominance']
+        if third == 0:
+            third_neu += 1
+        elif third == 1:
+            third_pos += 1
+        else:
+            third_neg += 1
+    print('arousal_neu:', first_neu)
+    print('arousal_pos:', first_pos)
+    print('arousal_neg:', first_neg)
+    print('valence_neu:', second_neu)
+    print('valence_pos:', second_pos)
+    print('valence_neg:', second_neg)
+    print('dominance_neu:', third_neu)
+    print('dominance_pos:', third_pos)
+    print('dominance_neg:', third_neg)
