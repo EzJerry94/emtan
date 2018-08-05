@@ -13,6 +13,7 @@ class MultiTrain():
         self.learning_rate = learning_rate
         self.train_sample_num = 31155
         self.predictions = predictions
+        self.ckpt_path = './ckpt/single/arousal/model.ckpt'
 
     def start_training(self):
         g = tf.Graph()
@@ -30,12 +31,21 @@ class MultiTrain():
             valences = tf.reshape(valences, (self.batch_size, self.num_classes))
             dominances = tf.one_hot(dominances, depth=3, axis=-1)
             dominances = tf.reshape(dominances, (self.batch_size, self.num_classes))
+
             frames = tf.reshape(frames, (self.batch_size, -1, 640))
 
-            train_prediction = self.predictions(frames)
-            loss = tf.nn.softmax_cross_entropy_with_logits(logits=train_prediction, labels=labels)
-            cross_entropy_mean = tf.reduce_mean(loss, name='cross_entropy')
-            optimizer = tf.train.AdamOptimizer(self.learning_rate).minimize(cross_entropy_mean)
+            arousals_prediction, valences_prediction, dominances_prediction = self.predictions(frames)
+
+            arousals_loss = tf.nn.softmax_cross_entropy_with_logits(logits=arousals_prediction, labels=arousals)
+            valences_loss = tf.nn.softmax_cross_entropy_with_logits(logits=valences_prediction, labels=valences)
+            dominances_loss = tf.nn.softmax_cross_entropy_with_logits(logits=dominances_prediction, labels=dominances)
+
+            arousals_cross_entropy_mean = tf.reduce_mean(arousals_loss, name='arousals_cross_entropy')
+            valences_cross_entropy_mean = tf.reduce_mean(valences_loss, name='valences_cross_entropy')
+            dominances_cross_entropy_mean = tf.reduce_mean(dominances_loss, name='dominances_cross_entropy')
+
+            total_loss = arousals_cross_entropy_mean + valences_cross_entropy_mean + dominances_cross_entropy_mean
+            optimizer = tf.train.AdamOptimizer(self.learning_rate).minimize(total_loss)
 
             saver = tf.train.Saver()
 
@@ -48,11 +58,11 @@ class MultiTrain():
                 sess.run(iterator.initializer)
                 for batch in range(train_num_batches):
                     start_time = time.time()
-                    _, loss_value = sess.run([optimizer, cross_entropy_mean])
+                    _, loss_value = sess.run([optimizer, total_loss])
                     time_step = time.time() - start_time
                     print("Epoch {}/{}: Batch {}/{}: loss = {:.4f} ({:.2f} sec/step)".format(
                         epoch + 1, self.epochs, batch + 1, train_num_batches, loss_value, time_step))
 
             print('\n Training Completed \n')
-            save_path = saver.save(sess, './ckpt/single/arousal/model.ckpt')
+            save_path = saver.save(sess, self.ckpt_path)
             print("Model saved in path: %s" % save_path)

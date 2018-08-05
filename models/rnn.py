@@ -6,8 +6,8 @@ class RNN():
         self.num_layers = 2
         self.hidden_units = 128
 
-    def create_model(self, inputs):
-        with tf.variable_scope("rnn"):
+    def create_model(self, inputs, scope):
+        with tf.variable_scope(scope):
             batch_size, seq_length, num_features = inputs.get_shape().as_list()
 
             def _get_cell():

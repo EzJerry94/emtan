@@ -29,8 +29,8 @@ class Attention:
         output_reshape = tf.reshape(output, (1, -1))
         return output_reshape
 
-    def create_model(self, inputs):
-        with tf.variable_scope("attention", reuse=tf.AUTO_REUSE):
+    def create_model(self, inputs, scope):
+        with tf.variable_scope(scope):
             u = tf.get_variable('u', shape=(128, 1),initializer=tf.random_uniform_initializer(),dtype=tf.float32,
                                 trainable=True)
             outputs = self.loop_inputs(inputs, u)

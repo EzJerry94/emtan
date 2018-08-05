@@ -35,7 +35,7 @@ class EMTAN():
         self.is_dominance = False
         # model parameters
         self.batch_size = 4
-        self.epochs = 2
+        self.epochs = 1
         self.num_classes = 3
         self.learning_rate = 1e-4
         self.is_attention = True
@@ -71,17 +71,28 @@ class EMTAN():
         cnn_output = cnn.create_model(frames, cnn.conv_filters)
         cnn_output = self._reshape_to_rnn(cnn_output)
         rnn = RNN()
-        rnn_output = rnn.create_model(cnn_output)
+        arousal_rnn_output = rnn.create_model(cnn_output, 'arousal_rnn')
+        valence_rnn_output = rnn.create_model(cnn_output, 'valence_rnn')
+        dominance_rnn_output = rnn.create_model(cnn_output, 'dominance_rnn')
         if self.is_attention:
             attention = Attention(self.batch_size)
-            attention_output = attention.create_model(rnn_output)
+            arousal_attention_output = attention.create_model(arousal_rnn_output, 'arousal_attention')
+            valence_attention_output = attention.create_model(valence_rnn_output, 'valence_attention')
+            dominance_attention_output = attention.create_model(dominance_rnn_output, 'dominance_attention')
             fc = FC(self.num_classes)
-            outputs = fc.create_model(attention_output)
+            arousal_fc_outputs = fc.create_model(arousal_attention_output, 'arousal_fc')
+            valence_fc_outputs = fc.create_model(valence_attention_output, 'valence_fc')
+            dominance_fc_outputs = fc.create_model(dominance_attention_output, 'dominance_fc')
         else:
-            rnn_output = rnn_output[:, -1, :]
+            arousal_rnn_output = arousal_rnn_output[:, -1, :]
+            valence_rnn_output = valence_rnn_output[:, -1, :]
+            dominance_rnn_output = dominance_rnn_output[:, -1, :]
             fc = FC(self.num_classes)
-            outputs = fc.create_model(rnn_output)
-        return outputs
+            arousal_fc_outputs = fc.create_model(arousal_rnn_output, 'arousal_fc')
+            valence_fc_outputs = fc.create_model(valence_rnn_output, 'valence_fc')
+            dominance_fc_outputs = fc.create_model(dominance_rnn_output, 'dominance_fc')
+
+        return arousal_fc_outputs, valence_fc_outputs, dominance_fc_outputs
 
     def multi_task_training(self):
         self.get_multi_train_data_provider()
