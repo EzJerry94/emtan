@@ -15,7 +15,7 @@ class EMTAN():
 
     def __init__(self):
         # operation parameter
-        self.operation = 'generate'
+        self.operation = 'evaluation'
         # data source parameters
         self.arousal_train_tfrecords = './data/arousal_train_set.tfrecords'
         self.arousal_validate_tfrecords = './data/arousal_train_set.tfrecords'
