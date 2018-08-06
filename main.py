@@ -4,6 +4,7 @@ from tfrecord_generator import Generator
 from training import Train
 from multi_training import MultiTrain
 from multi_data_provider import MultiDataProvider
+from multi_evaluation import MultiEvaluation
 from models.cnn import CNN
 from models.rnn import RNN
 from models.fc import FC
@@ -115,11 +116,8 @@ class EMTAN():
     def multi_task_validation(self):
         self.get_multi_validation_data_provider()
         predictions = self.get_multi_predictions
-
-
-    def multi_evaluation(self):
-
-        pass
+        validation = MultiEvaluation(self.multi_validation_data_provider, 1, self.num_classes, predictions)
+        validation.start_evaluation()
 
     def single_evaluation(self):
         pass
@@ -167,7 +165,7 @@ def main():
             net.single_task_training()
     elif net.operation == 'evaluation':
         if net.is_multi:
-            net.multi_evaluation()
+            net.multi_task_validation()
         else:
             net.single_evaluation()
 
