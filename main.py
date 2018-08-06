@@ -56,8 +56,8 @@ class EMTAN():
         return frames
 
     def process_stats(self):
-        original_file = './data/validation.csv'
-        csv_file = './data/validation_set.csv'
+        original_file = './data/raw/test.csv'
+        csv_file = './data/raw/test_set.csv'
         utils.preprocess_stats(original_file, csv_file)
 
     def tfrecords_generate(self):
