@@ -35,7 +35,7 @@ class EMTAN():
         self.is_valence = False
         self.is_dominance = False
         # model parameters
-        self.batch_size = 4
+        self.batch_size = 1
         self.epochs = 1
         self.num_classes = 3
         self.learning_rate = 1e-4
@@ -116,7 +116,7 @@ class EMTAN():
     def multi_task_validation(self):
         self.get_multi_validation_data_provider()
         predictions = self.get_multi_predictions
-        validation = MultiEvaluation(self.multi_validation_data_provider, 1, self.num_classes, predictions)
+        validation = MultiEvaluation(self.multi_validation_data_provider, self.batch_size, self.num_classes, predictions)
         validation.start_evaluation()
 
     def single_evaluation(self):
