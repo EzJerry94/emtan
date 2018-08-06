@@ -26,8 +26,8 @@ class EMTAN():
         self.dominance_validate_tfrecords = './data/arousal_train_set.tfrecords'
         self.dominance_test_tfrecords = './data/arousal_train_set.tfrecords'
         self.multi_train_tfrecords = './data/multi/multi_train_set.tfrecords'
-        self.multi_validate_tfrecords = ''
-        self.multi_test_tfrecords = ''
+        self.multi_validation_tfrecords = './data/multi/multi_validation_set.tfrecords'
+        self.multi_test_tfrecords = './data/multi/multi_test_set.tfrecords'
         # train parameters
         self.is_multi = True
         self.is_arousal = False
@@ -67,6 +67,12 @@ class EMTAN():
     def get_multi_train_data_provider(self):
         self.multi_train_data_provider = MultiDataProvider(self.multi_train_tfrecords, self.batch_size, True)
 
+    def get_multi_validation_data_provider(self):
+        self.multi_validation_data_provider = MultiDataProvider(self.multi_validation_tfrecords, self.batch_size, False)
+
+    def get_multi_test_data_provider(self):
+        self.multi_test_data_provider = MultiDataProvider(self.multi_test_tfrecords, self.batch_size, False)
+
     def get_multi_predictions(self, frames):
         frames = self._reshape_to_conv(frames)
         cnn = CNN()
@@ -105,6 +111,11 @@ class EMTAN():
         train = MultiTrain(self.multi_train_data_provider, self.batch_size, self.epochs,
                       self.num_classes, self.learning_rate, predictions)
         train.start_training()
+
+    def multi_task_validation(self):
+        self.get_multi_validation_data_provider()
+        predictions = self.get_multi_predictions
+
 
     def multi_evaluation(self):
 
