@@ -39,6 +39,8 @@ class EMTAN():
         self.num_classes = 3
         self.learning_rate = 1e-4
         self.is_attention = True
+        self.is_training = True
+        self.keep_prob = 0.5
 
     def _reshape_to_conv(self, frames):
         frame_shape = frames.get_shape().as_list()
@@ -68,7 +70,10 @@ class EMTAN():
     def get_multi_predictions(self, frames):
         frames = self._reshape_to_conv(frames)
         cnn = CNN()
-        cnn_output = cnn.create_model(frames, cnn.conv_filters)
+        if self.is_training:
+            cnn_output = cnn.create_model(frames, cnn.conv_filters, keep_prob=self.keep_prob)
+        else:
+            cnn_output = cnn.create_model(frames, cnn.conv_filters, keep_prob=1.0)
         cnn_output = self._reshape_to_rnn(cnn_output)
         rnn = RNN()
         arousal_rnn_output = rnn.create_model(cnn_output, 'arousal_rnn')

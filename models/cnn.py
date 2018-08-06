@@ -8,7 +8,7 @@ class CNN():
         self.is_training = True
         self.conv_filters = 40
 
-    def create_model(self, frames, conv_filters):
+    def create_model(self, frames, conv_filters, keep_prob):
         with tf.variable_scope("cnn"):
             batch_size, num_features = frames.get_shape().as_list()
             shape = ([-1, 1, num_features, 1])
@@ -16,6 +16,8 @@ class CNN():
 
             with slim.arg_scope([slim.layers.conv2d], padding='SAME'):
                 #net = slim.dropout(audio_input, is_training=self.is_training)
+                net = tf.nn.dropout(audio_input, keep_prob=keep_prob, name='dropout')
+
                 net = slim.layers.conv2d(audio_input, conv_filters, (1, 20))
 
                 # Subsampling of the signal to 8Khz
