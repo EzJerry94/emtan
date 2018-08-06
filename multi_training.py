@@ -13,7 +13,7 @@ class MultiTrain():
         self.learning_rate = learning_rate
         self.train_sample_num = 31155
         self.predictions = predictions
-        self.ckpt_path = './ckpt/single/arousal/model.ckpt'
+        self.ckpt_path = './ckpt/multi/multi_model.ckpt'
 
     def start_training(self):
         g = tf.Graph()
