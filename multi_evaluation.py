@@ -1,5 +1,6 @@
 import tensorflow as tf
 from sklearn.metrics import recall_score
+from sklearn.metrics import f1_score
 import numpy as np
 
 class MultiEvaluation:
@@ -83,3 +84,10 @@ class MultiEvaluation:
             print("arousal uar: ", arousal_mean_eval)
             print("valence uar: ", valence_mean_eval)
             print("dominance uar: ", dominance_mean_eval)
+
+            arousal_f1 = f1_score(eval_arousal_labels_list, eval_arousal_predictions_list, average="macro")
+            valence_f1 = f1_score(eval_valence_labels_list, eval_valence_predictions_list, average="macro")
+            dominance_f1 = f1_score(eval_dominance_labels_list, eval_dominance_predictions_list, average="macro")
+            print("arousal f1: ", arousal_f1)
+            print("valence f1: ", valence_f1)
+            print("dominance f1: ", dominance_f1)
