@@ -9,10 +9,10 @@ from moviepy.editor import AudioFileClip
 class Generator:
 
     def __init__(self):
-        self.csv = 'data/raw/train_set.csv'
+        self.csv = 'data/raw/validation_set.csv'
         self.upsample = True
         self.classes = 3
-        self.tfrecords_file = 'data/multi/multi_train_set.tfrecords'
+        self.tfrecords_file = 'data/multi/multi_validation_set.tfrecords'
 
     def _int_feature(self, value):
         return tf.train.Feature(int64_list=tf.train.Int64List(value=[value]))
@@ -80,12 +80,15 @@ class Generator:
                                        'arousal': np.int32(row[1]),
                                        'valence': np.int32(row[2]),
                                        'dominance': np.int32(row[3])}
+
         utils.upsample_stats_distribution(self.dict_files)
         print('***********************************')
+        '''
         self.dict_files = self.multi_upsample(self.dict_files, 'arousal')
         self.dict_files = self.multi_upsample(self.dict_files, 'valence')
         self.dict_files = self.multi_upsample(self.dict_files, 'dominance')
         utils.upsample_stats_distribution(self.dict_files)
+        '''
 
         print('\n Start generating tfrecords \n')
 

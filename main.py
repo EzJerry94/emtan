@@ -14,7 +14,7 @@ class EMTAN():
 
     def __init__(self):
         # operation parameter
-        self.operation = 'training'
+        self.operation = 'generate'
         # data source parameters
         self.arousal_train_tfrecords = './data/arousal_train_set.tfrecords'
         self.arousal_validate_tfrecords = './data/arousal_train_set.tfrecords'
@@ -106,6 +106,13 @@ class EMTAN():
                       self.num_classes, self.learning_rate, predictions)
         train.start_training()
 
+    def multi_evaluation(self):
+
+        pass
+
+    def single_evaluation(self):
+        pass
+
     def single_task_training(self):
         pass
 
@@ -133,6 +140,7 @@ class EMTAN():
                           self.num_classes, self.learning_rate, predictions)
         eval.start_evaluation()
 
+
 def main():
     net = EMTAN()
     if net.operation == 'process_stats':
@@ -146,6 +154,11 @@ def main():
             net.multi_task_training()
         else:
             net.single_task_training()
+    elif net.operation == 'evaluation':
+        if net.is_multi:
+            net.multi_evaluation()
+        else:
+            net.single_evaluation()
 
 if __name__ == '__main__':
     main()
