@@ -15,7 +15,7 @@ class EMTAN():
 
     def __init__(self):
         # operation parameter
-        self.operation = 'evaluation'
+        self.operation = 'training'
         # data source parameters
         self.arousal_train_tfrecords = './data/arousal_train_set.tfrecords'
         self.arousal_validate_tfrecords = './data/arousal_train_set.tfrecords'
@@ -40,7 +40,6 @@ class EMTAN():
         self.num_classes = 3
         self.learning_rate = 1e-4
         self.is_attention = True
-        self.is_training = True
         self.keep_prob = 0.5
 
     def _reshape_to_conv(self, frames):

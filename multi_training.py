@@ -14,6 +14,9 @@ class MultiTrain():
         self.train_sample_num = 31155
         self.predictions = predictions
         self.ckpt_path = './ckpt/multi/multi_model.ckpt'
+        self.a = 1.0
+        self.b = 1.0
+        self.c = 1.0
 
     def start_training(self):
         g = tf.Graph()
@@ -44,7 +47,9 @@ class MultiTrain():
             valences_cross_entropy_mean = tf.reduce_mean(valences_loss, name='valences_cross_entropy')
             dominances_cross_entropy_mean = tf.reduce_mean(dominances_loss, name='dominances_cross_entropy')
 
-            total_loss = arousals_cross_entropy_mean + valences_cross_entropy_mean + dominances_cross_entropy_mean
+            total_loss = self.a * arousals_cross_entropy_mean + \
+                         self.b * valences_cross_entropy_mean + \
+                         self.c * dominances_cross_entropy_mean
             optimizer = tf.train.AdamOptimizer(self.learning_rate).minimize(total_loss)
 
             saver = tf.train.Saver()
