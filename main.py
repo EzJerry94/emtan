@@ -77,7 +77,7 @@ class EMTAN():
     def get_multi_predictions(self, frames):
         frames = self._reshape_to_conv(frames)
         cnn = CNN()
-        if self.is_training:
+        if self.operation == 'training':
             cnn_output = cnn.create_model(frames, cnn.conv_filters, keep_prob=self.keep_prob)
         else:
             cnn_output = cnn.create_model(frames, cnn.conv_filters, keep_prob=1.0)
