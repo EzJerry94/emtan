@@ -8,7 +8,7 @@ from moviepy.editor import AudioFileClip
 
 class SingleGenerator:
 
-    def __init__(self, csv, attribute, tfrecords_file, unsample):
+    def __init__(self, attribute, csv, tfrecords_file, unsample):
         self.csv = csv
         self.upsample = unsample
         self.classes = 3
