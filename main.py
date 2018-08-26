@@ -31,8 +31,8 @@ class EMTAN():
         self.multi_test_tfrecords = './data/multi/multi_test_set.tfrecords'
         # train parameters
         self.is_multi = False
-        self.is_arousal = True
-        self.is_valence = False
+        self.is_arousal = False
+        self.is_valence = True
         self.is_dominance = False
         # model parameters
         self.batch_size = 1
@@ -70,6 +70,14 @@ class EMTAN():
         validate_generator = SingleGenerator('arousal', 'data/raw/validation_set.csv', self.arousal_validate_tfrecords, False)
         validate_generator.write_tfrecords()
         test_generator = SingleGenerator('arousal', 'data/raw/test_set.csv', self.arousal_test_tfrecords, False)
+        test_generator.write_tfrecords()
+
+    def valence_tfrecords_generate(self):
+        train_generator = SingleGenerator('valence', 'data/raw/train_set.csv', self.valence_train_tfrecords, True)
+        train_generator.write_tfrecords()
+        validate_generator = SingleGenerator('valence', 'data/raw/validation_set.csv', self.valence_validate_tfrecords, False)
+        validate_generator.write_tfrecords()
+        test_generator = SingleGenerator('valence', 'data/raw/test_set.csv', self.valence_test_tfrecords, False)
         test_generator.write_tfrecords()
 
     def get_multi_train_data_provider(self):
@@ -168,6 +176,8 @@ def main():
             net.tfrecords_generate()
         elif net.is_arousal:
             net.arousal_tfrecords_generate()
+        elif net.is_valence:
+            net.valence_tfrecords_generate()
     elif net.operation == 'training':
         if net.is_multi:
             net.multi_task_training()
