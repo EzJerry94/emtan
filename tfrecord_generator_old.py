@@ -6,17 +6,14 @@ import utils
 from moviepy.editor import AudioFileClip
 
 
-class Generator:
+class SingleGenerator:
 
-    def __init__(self):
-        self.csv = 'data/raw/train_set.csv'
-        self.upsample = True
+    def __init__(self, csv, attribute, tfrecords_file, unsample):
+        self.csv = csv
+        self.upsample = unsample
         self.classes = 3
-        self.tfrecords_file = 'data/arousal/multi_train_set.tfrecords'
-        self.attribute = 'arousal'
-        self.num_arousal_after_upsample = 9051
-        self.num_valence_after_upsample = 14022
-        self.num_dominance_after_upsample = 12393
+        self.tfrecords_file = tfrecords_file
+        self.attribute = attribute
 
     def _int_feature(self, value):
         return tf.train.Feature(int64_list=tf.train.Int64List(value=[value]))
@@ -71,89 +68,6 @@ class Generator:
 
         return augmented_data
 
-    def multi_sample_num_same(self, data, diff):
-        each_class = diff // 3
-        neu_index = [] # 0
-        pos_index = [] # 1
-        neg_index = [] # 2
-        for item in data.keys():
-            if data[item]['label'] == 0:
-                neu_index.append(item)
-            elif data[item]['label'] == 1:
-                pos_index.append(item)
-            else:
-                neg_index.append(item)
-
-        random.seed(3)
-        neu_add_index = random.sample(neu_index, each_class)
-        pos_add_index = random.sample(pos_index, each_class)
-        neg_add_index = random.sample(neg_index, each_class)
-        for index in neu_add_index:
-            data[index + '_' + 'multi'] = {'file': data[index]['file'],
-                                           'label': data[index]['label']}
-        for index in pos_add_index:
-            data[index + '_' + 'multi'] = {'file': data[index]['file'],
-                                           'label': data[index]['label']}
-        for index in neg_add_index:
-            data[index + '_' + 'multi'] = {'file': data[index]['file'],
-                                           'label': data[index]['label']}
-        return data
-
-    def multi_upsample(self, sample_data, attribute):
-        classes = [int(x[attribute]) for x in sample_data.values()]
-        class_ids = set(classes)
-        num_samples_per_class = {class_name: sum(x == class_name for x in classes) for class_name in class_ids}
-
-        max_samples = np.max(list(num_samples_per_class.values()))
-        augmented_data = copy.copy(sample_data)
-        for class_name, n_samples in num_samples_per_class.items():
-            n_samples_to_add = max_samples - n_samples
-
-            while n_samples_to_add > 0:
-                for key, value in sample_data.items():
-                    arousal = int(value['arousal'])
-                    valence = int(value['valence'])
-                    dominance = int(value['dominance'])
-                    sample = key
-                    if n_samples_to_add <= 0:
-                        break
-
-                    if attribute == 'arousal':
-                        label = arousal
-                    elif attribute == 'valence':
-                        label = valence
-                    else:
-                        label = dominance
-
-                    if label == class_name:
-                        augmented_data[sample + '_' + str(n_samples_to_add)] = {'file': value['file'],
-                                                                                'arousal': np.int32(arousal),
-                                                                                'valence': np.int32(valence),
-                                                                                'dominance': np.int32(dominance)}
-                        n_samples_to_add -= 1
-
-        return augmented_data
-
-    def write_multi_tfrecords(self):
-        self.read_multi_csv(self.csv)
-        self.dict_files = dict()
-        for row in self.data:
-            self.dict_files[row[0]] = {'file': row[0],
-                                       'arousal': np.int32(row[1]),
-                                       'valence': np.int32(row[2]),
-                                       'dominance': np.int32(row[3])}
-        utils.upsample_stats_distribution(self.dict_files)
-        print('***********************************')
-        self.dict_files = self.multi_upsample(self.dict_files, 'arousal')
-        utils.upsample_stats_distribution(self.dict_files)
-        print('***********************************')
-        self.dict_files = self.multi_upsample(self.dict_files, 'valence')
-        utils.upsample_stats_distribution(self.dict_files)
-        print('***********************************')
-        self.dict_files = self.multi_upsample(self.dict_files, 'dominance')
-        utils.upsample_stats_distribution(self.dict_files)
-        pass
-
     def write_tfrecords(self):
         self.read_csv(self.csv, self.attribute)
         self.dict_files = dict()
@@ -163,13 +77,6 @@ class Generator:
                                        }
         if self.upsample:
             self.dict_files = self.upsample_process(self.dict_files)
-
-        if self.attribute == 'arousal' and self.upsample:
-            self.dict_files = self.multi_sample_num_same(self.dict_files,
-                                                         self.num_valence_after_upsample - self.num_arousal_after_upsample)
-        if self.attribute == 'dominance' and self.upsample:
-            self.dict_files = self.multi_sample_num_same(self.dict_files,
-                                                         self.num_valence_after_upsample - self.num_dominance_after_upsample)
 
         print('\n Start generating tfrecords \n')
 
