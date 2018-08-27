@@ -31,7 +31,7 @@ class Evaluation:
             labels = tf.reshape(labels, (self.batch_size, self.num_classes))
             frames = tf.reshape(frames, (self.batch_size, -1, 640))
 
-            eval_prediction = self.predictions(frames)
+            eval_prediction = self.predictions(frames, self.scope)
             saver = tf.train.Saver()
 
         with tf.Session(graph=g) as sess:
