@@ -5,15 +5,17 @@ import time
 class Train():
 
     def __init__(self, train_data_provider, batch_size, epochs, num_classes,
-                 learning_rate, predictions):
+                 learning_rate, predictions, train_sample_num, save_path, scope):
         self.train_data_provider = train_data_provider
         self.batch_size = batch_size
         self.epochs = epochs
         self.num_classes = num_classes
         self.learning_rate = learning_rate
-        self.train_sample_num = 9051
-        #self.validate_sample_num = 895
+        self.train_sample_num = train_sample_num
         self.predictions = predictions
+        self.save_path = save_path
+        self.scope = scope
+        self.ckpt_path = './ckpt/multi/multi_model.ckpt'
 
     def start_training(self):
         g = tf.Graph()
@@ -29,7 +31,7 @@ class Train():
             labels = tf.reshape(labels, (self.batch_size, self.num_classes))
             frames = tf.reshape(frames, (self.batch_size, -1, 640))
 
-            train_prediction = self.predictions(frames)
+            train_prediction = self.predictions(frames, self.scope)
             loss = tf.nn.softmax_cross_entropy_with_logits(logits=train_prediction, labels=labels)
             cross_entropy_mean = tf.reduce_mean(loss, name='cross_entropy')
             optimizer = tf.train.AdamOptimizer(self.learning_rate).minimize(cross_entropy_mean)
@@ -38,7 +40,9 @@ class Train():
 
         with tf.Session(graph=g) as sess:
             train_num_batches = int(self.train_sample_num / self.batch_size)
-            sess.run(tf.global_variables_initializer())
+            #sess.run(tf.global_variables_initializer())
+            saver.restore(sess, self.ckpt_path)
+            print("Model restored.")
 
             for epoch in range(self.epochs):
                 print('\n Start Training for epoch {}\n'.format(epoch + 1))
@@ -51,5 +55,5 @@ class Train():
                         epoch + 1, self.epochs, batch + 1, train_num_batches, loss_value, time_step))
 
             print('\n Training Completed \n')
-            save_path = saver.save(sess, './ckpt/single/arousal/model.ckpt')
+            save_path = saver.save(sess, self.save_path)
             print("Model saved in path: %s" % save_path)

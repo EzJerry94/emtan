@@ -4,6 +4,8 @@ from tfrecord_generator import Generator
 from tfrecord_generator_old import SingleGenerator
 from multi_training import MultiTrain
 from multi_data_provider import MultiDataProvider
+from data_provider import DataProvider
+from training import Train
 from multi_evaluation import MultiEvaluation
 from models.cnn import CNN
 from models.rnn import RNN
@@ -15,7 +17,7 @@ class EMTAN():
 
     def __init__(self):
         # operation parameter
-        self.operation = 'generate'
+        self.operation = 'training'
         # data source parameters
         self.arousal_train_tfrecords = './data/arousal/train_set.tfrecords'
         self.arousal_validate_tfrecords = './data/arousal/validate_set.tfrecords'
@@ -31,12 +33,12 @@ class EMTAN():
         self.multi_test_tfrecords = './data/multi/multi_test_set.tfrecords'
         # train parameters
         self.is_multi = False
-        self.is_arousal = False
+        self.is_arousal = True
         self.is_valence = False
-        self.is_dominance = True
+        self.is_dominance = False
         # model parameters
-        self.batch_size = 1
-        self.epochs = 1
+        self.batch_size = 2
+        self.epochs = 2
         self.num_classes = 3
         self.learning_rate = 1e-4
         self.is_attention = True
@@ -142,28 +144,42 @@ class EMTAN():
         validation = MultiEvaluation(self.multi_validation_data_provider, self.batch_size, self.num_classes, predictions)
         validation.start_evaluation()
 
-    def single_evaluation(self):
-        pass
+    def get_single_train_data_provider(self, train_tfrecords):
+        self.single_train_data_provider = DataProvider(train_tfrecords, self.batch_size, True)
 
-    def single_task_training(self):
-        pass
+    def get_single_validate_data_provider(self, validate_tfrecords):
+        self.single_validate_data_provider = DataProvider(validate_tfrecords, self.batch_size, False)
 
-    def get_predictions(self, frames):
+    def get_single_test_data_provider(self, test_tfrecords):
+        self.single_test_data_provider = DataProvider(test_tfrecords, self.batch_size, False)
+
+    def arousal_training(self):
+        self.get_single_train_data_provider(self.arousal_train_tfrecords)
+        predictions = self.get_predictions
+        train = Train(self.single_train_data_provider, self.batch_size, self.epochs, self.num_classes,
+                      self.learning_rate, predictions, 9051, './ckpt/arousal/model.ckpt', 'arousal')
+        train.start_training()
+
+
+    def get_predictions(self, frames, scope):
         frames = self._reshape_to_conv(frames)
         cnn = CNN()
-        cnn_output = cnn.create_model(frames, cnn.conv_filters)
+        if self.operation == 'training':
+            cnn_output = cnn.create_model(frames, cnn.conv_filters, keep_prob=self.keep_prob)
+        else:
+            cnn_output = cnn.create_model(frames, cnn.conv_filters, keep_prob=1.0)
         cnn_output = self._reshape_to_rnn(cnn_output)
         rnn = RNN()
-        rnn_output = rnn.create_model(cnn_output)
+        rnn_output = rnn.create_model(cnn_output, scope + '_rnn')
         if self.is_attention:
             attention = Attention(self.batch_size)
-            attention_output = attention.create_model(rnn_output)
+            attention_output = attention.create_model(rnn_output, scope + '_attention')
             fc = FC(self.num_classes)
-            outputs = fc.create_model(attention_output)
+            outputs = fc.create_model(attention_output, scope + '_fc')
         else:
             rnn_output = rnn_output[:, -1, :]
             fc = FC(self.num_classes)
-            outputs = fc.create_model(rnn_output)
+            outputs = fc.create_model(rnn_output, scope + '_fc')
         return outputs
 
     def evaluation(self):
@@ -191,8 +207,12 @@ def main():
     elif net.operation == 'training':
         if net.is_multi:
             net.multi_task_training()
-        else:
-            net.single_task_training()
+        elif net.is_arousal:
+            net.arousal_training()
+        elif net.is_valence:
+            net.valence_tfrecords_generate()
+        elif net.is_dominance:
+            net.dominance_tfrecords_generate()
     elif net.operation == 'evaluation':
         if net.is_multi:
             net.multi_task_validation()
