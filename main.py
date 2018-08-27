@@ -164,7 +164,7 @@ class EMTAN():
     def arousal_validation(self):
         self.get_single_validate_data_provider(self.arousal_validate_tfrecords)
         predictions = self.get_predictions
-        validation = Evaluation(self.single_train_data_provider, self.batch_size, self.epochs, self.num_classes,
+        validation = Evaluation(self.single_validate_data_provider, self.batch_size, self.epochs, self.num_classes,
                                 self.learning_rate, predictions, 1811, 'arousal')
         validation.start_evaluation()
 
