@@ -7,6 +7,7 @@ from multi_data_provider import MultiDataProvider
 from data_provider import DataProvider
 from training import Train
 from multi_evaluation import MultiEvaluation
+from evaluation import Evaluation
 from models.cnn import CNN
 from models.rnn import RNN
 from models.fc import FC
@@ -17,7 +18,7 @@ class EMTAN():
 
     def __init__(self):
         # operation parameter
-        self.operation = 'training'
+        self.operation = 'evaluation'
         # data source parameters
         self.arousal_train_tfrecords = './data/arousal/train_set.tfrecords'
         self.arousal_validate_tfrecords = './data/arousal/validate_set.tfrecords'
@@ -160,6 +161,13 @@ class EMTAN():
                       self.learning_rate, predictions, 9051, './ckpt/arousal/model.ckpt', 'arousal')
         train.start_training()
 
+    def arousal_validation(self):
+        self.get_single_validate_data_provider(self.arousal_validate_tfrecords)
+        predictions = self.get_predictions
+        validation = Evaluation(self.single_train_data_provider, self.batch_size, self.epochs, self.num_classes,
+                                self.learning_rate, predictions, 1811, 'arousal')
+        validation.start_evaluation()
+
 
     def get_predictions(self, frames, scope):
         frames = self._reshape_to_conv(frames)
@@ -216,8 +224,12 @@ def main():
     elif net.operation == 'evaluation':
         if net.is_multi:
             net.multi_task_validation()
-        else:
-            net.single_evaluation()
+        elif net.is_arousal:
+            net.arousal_validation()
+        elif net.is_valence:
+            net.valence_tfrecords_generate()
+        elif net.is_dominance:
+            net.dominance_tfrecords_generate()
 
 if __name__ == '__main__':
     main()

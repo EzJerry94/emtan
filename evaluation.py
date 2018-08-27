@@ -1,19 +1,21 @@
 import tensorflow as tf
 from sklearn.metrics import recall_score
+from sklearn.metrics import f1_score
 import numpy as np
 
 class Evaluation:
 
     def __init__(self, eval_data_provider, batch_size, epochs, num_classes,
-                 learning_rate, predictions):
+                 learning_rate, predictions, eval_sample_num, scope):
         self.eval_data_provider = eval_data_provider
         self.batch_size = batch_size
         self.epochs = epochs
         self.num_classes = num_classes
         self.learning_rate = learning_rate
-        self.eval_sample_num = 895
+        self.eval_sample_num = eval_sample_num
         self.predictions = predictions
-        self.model_path = './ckpt/single/arousal/model.ckpt'
+        self.scope = scope
+        self.model_path = './ckpt/arousal/model.ckpt'
 
     def start_evaluation(self):
         g = tf.Graph()
@@ -53,4 +55,6 @@ class Evaluation:
             eval_labels_list = np.argmax(eval_labels_list, axis=1)
 
             mean_eval = recall_score(eval_labels_list, eval_predictions_list, average="macro")
+            f1 = f1_score(eval_labels_list, eval_predictions_list, average="macro")
             print("uar: ", mean_eval)
+            print("f1:", f1)
