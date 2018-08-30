@@ -18,7 +18,7 @@ class EMTAN():
 
     def __init__(self):
         # operation parameter
-        self.operation = 'evaluation'
+        self.operation = 'training'
         # data source parameters
         self.arousal_train_tfrecords = './data/arousal/train_set.tfrecords'
         self.arousal_validate_tfrecords = './data/arousal/validate_set.tfrecords'
@@ -33,15 +33,15 @@ class EMTAN():
         self.multi_validation_tfrecords = './data/multi/multi_validation_set.tfrecords'
         self.multi_test_tfrecords = './data/multi/multi_test_set.tfrecords'
         # train parameters
-        self.is_multi = False
-        self.is_arousal = True
+        self.is_multi = True
+        self.is_arousal = False
         self.is_valence = False
         self.is_dominance = False
         # model parameters
-        self.batch_size = 2
+        self.batch_size = 4
         self.epochs = 2
         self.num_classes = 3
-        self.learning_rate = 1e-4
+        self.learning_rate = 5e-5
         self.is_attention = True
         self.keep_prob = 0.5
 

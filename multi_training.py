@@ -23,6 +23,8 @@ class MultiTrain():
         with g.as_default():
             tf.set_random_seed(3)  # set random seed for initialization
 
+            steps = tf.Variable(0, trainable=False)
+
             self.train_data_provider.get_batch()
 
             iterator = self.train_data_provider.dataset.make_initializable_iterator()
@@ -50,7 +52,7 @@ class MultiTrain():
             total_loss = self.a * arousals_cross_entropy_mean + \
                          self.b * valences_cross_entropy_mean + \
                          self.c * dominances_cross_entropy_mean
-            optimizer = tf.train.AdamOptimizer(self.learning_rate).minimize(total_loss)
+            optimizer = tf.train.AdamOptimizer(self.learning_rate).minimize(total_loss, global_step=steps)
 
             saver = tf.train.Saver()
 
@@ -68,6 +70,7 @@ class MultiTrain():
                     print("Epoch {}/{}: Batch {}/{}: loss = {:.4f} ({:.2f} sec/step)".format(
                         epoch + 1, self.epochs, batch + 1, train_num_batches, loss_value, time_step))
 
+                save_path = saver.save(sess, self.ckpt_path, global_step=steps)
+                print("Model saved in path: %s" % save_path)
+
             print('\n Training Completed \n')
-            save_path = saver.save(sess, self.ckpt_path)
-            print("Model saved in path: %s" % save_path)
