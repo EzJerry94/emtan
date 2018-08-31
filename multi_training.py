@@ -54,7 +54,7 @@ class MultiTrain():
                          self.c * dominances_cross_entropy_mean
             optimizer = tf.train.AdamOptimizer(self.learning_rate).minimize(total_loss, global_step=steps)
 
-            saver = tf.train.Saver()
+            saver = tf.train.Saver(max_to_keep=50)
 
         with tf.Session(graph=g) as sess:
             train_num_batches = int(self.train_sample_num / self.batch_size)

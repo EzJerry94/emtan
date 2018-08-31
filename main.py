@@ -39,7 +39,7 @@ class EMTAN():
         self.is_dominance = False
         # model parameters
         self.batch_size = 4
-        self.epochs = 2
+        self.epochs = 50
         self.num_classes = 3
         self.learning_rate = 5e-5
         self.is_attention = True
