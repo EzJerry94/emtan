@@ -168,6 +168,20 @@ class EMTAN():
                                 self.learning_rate, predictions, 1811, 'arousal')
         validation.start_evaluation()
 
+    def valence_training(self):
+        self.get_single_train_data_provider(self.valence_train_tfrecords)
+        predictions = self.get_predictions
+        train = Train(self.single_train_data_provider, self.batch_size, self.epochs, self.num_classes,
+                      self.learning_rate, predictions, 14022, './ckpt/valence/model.ckpt', 'valence')
+        train.start_training()
+
+    def valence_validation(self):
+        self.get_single_validate_data_provider(self.valence_validate_tfrecords)
+        predictions = self.get_predictions
+        validation = Evaluation(self.single_validate_data_provider, self.batch_size, self.epochs, self.num_classes,
+                                self.learning_rate, predictions, 1811, 'valence')
+        validation.start_evaluation()
+
 
     def get_predictions(self, frames, scope):
         frames = self._reshape_to_conv(frames)
@@ -218,7 +232,7 @@ def main():
         elif net.is_arousal:
             net.arousal_training()
         elif net.is_valence:
-            net.valence_tfrecords_generate()
+            net.valence_training()
         elif net.is_dominance:
             net.dominance_tfrecords_generate()
     elif net.operation == 'evaluation':
