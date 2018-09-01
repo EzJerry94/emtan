@@ -158,28 +158,45 @@ class EMTAN():
         self.get_single_train_data_provider(self.arousal_train_tfrecords)
         predictions = self.get_predictions
         train = Train(self.single_train_data_provider, self.batch_size, self.epochs, self.num_classes,
-                      self.learning_rate, predictions, 9051, './ckpt/arousal/model.ckpt', 'arousal')
+                      self.learning_rate, predictions, 9051, './ckpt/arousal/model.ckpt', 'arousal',
+                      'None')
         train.start_training()
 
     def arousal_validation(self):
         self.get_single_validate_data_provider(self.arousal_validate_tfrecords)
         predictions = self.get_predictions
         validation = Evaluation(self.single_validate_data_provider, self.batch_size, self.epochs, self.num_classes,
-                                self.learning_rate, predictions, 1811, 'arousal')
+                                self.learning_rate, predictions, 1811, 'arousal', './ckpt/arousal/model.ckpt')
         validation.start_evaluation()
 
     def valence_training(self):
         self.get_single_train_data_provider(self.valence_train_tfrecords)
         predictions = self.get_predictions
         train = Train(self.single_train_data_provider, self.batch_size, self.epochs, self.num_classes,
-                      self.learning_rate, predictions, 14022, './ckpt/valence/model.ckpt', 'valence')
+                      self.learning_rate, predictions, 14022, './ckpt/valence/model.ckpt', 'valence',
+                      'None')
         train.start_training()
 
     def valence_validation(self):
         self.get_single_validate_data_provider(self.valence_validate_tfrecords)
         predictions = self.get_predictions
         validation = Evaluation(self.single_validate_data_provider, self.batch_size, self.epochs, self.num_classes,
-                                self.learning_rate, predictions, 1811, 'valence')
+                                self.learning_rate, predictions, 1811, 'valence' ,'./ckpt/valence/model.ckpt')
+        validation.start_evaluation()
+
+    def dominance_training(self):
+        self.get_single_train_data_provider(self.dominance_train_tfrecords)
+        predictions = self.get_predictions
+        train = Train(self.single_train_data_provider, self.batch_size, self.epochs, self.num_classes,
+                      self.learning_rate, predictions, 14022, './ckpt/dominance/model.ckpt', 'dominance',
+                      'None')
+        train.start_training()
+
+    def dominance_validation(self):
+        self.get_single_validate_data_provider(self.dominance_validate_tfrecords)
+        predictions = self.get_predictions
+        validation = Evaluation(self.single_validate_data_provider, self.batch_size, self.epochs, self.num_classes,
+                                self.learning_rate, predictions, 1811, 'dominance' ,'./ckpt/dominance/model.ckpt')
         validation.start_evaluation()
 
 
@@ -203,12 +220,6 @@ class EMTAN():
             fc = FC(self.num_classes)
             outputs = fc.create_model(rnn_output, scope + '_fc')
         return outputs
-
-    def evaluation(self):
-        predictions = self.get_predictions
-        eval = Evaluation(self.validate_data_provider, self.batch_size, self.epochs,
-                          self.num_classes, self.learning_rate, predictions)
-        eval.start_evaluation()
 
 
 def main():
@@ -234,16 +245,16 @@ def main():
         elif net.is_valence:
             net.valence_training()
         elif net.is_dominance:
-            net.dominance_tfrecords_generate()
+            net.dominance_training()
     elif net.operation == 'evaluation':
         if net.is_multi:
             net.multi_task_validation()
         elif net.is_arousal:
             net.arousal_validation()
         elif net.is_valence:
-            net.valence_tfrecords_generate()
+            net.valence_validation()
         elif net.is_dominance:
-            net.dominance_tfrecords_generate()
+            net.dominance_validation()
 
 if __name__ == '__main__':
     main()

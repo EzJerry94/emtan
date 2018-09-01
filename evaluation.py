@@ -6,7 +6,7 @@ import numpy as np
 class Evaluation:
 
     def __init__(self, eval_data_provider, batch_size, epochs, num_classes,
-                 learning_rate, predictions, eval_sample_num, scope):
+                 learning_rate, predictions, eval_sample_num, scope, model_path):
         self.eval_data_provider = eval_data_provider
         self.batch_size = batch_size
         self.epochs = epochs
@@ -15,7 +15,7 @@ class Evaluation:
         self.eval_sample_num = eval_sample_num
         self.predictions = predictions
         self.scope = scope
-        self.model_path = './ckpt/arousal/model.ckpt'
+        self.model_path = model_path
 
     def start_evaluation(self):
         g = tf.Graph()

@@ -5,7 +5,7 @@ import time
 class Train():
 
     def __init__(self, train_data_provider, batch_size, epochs, num_classes,
-                 learning_rate, predictions, train_sample_num, save_path, scope):
+                 learning_rate, predictions, train_sample_num, save_path, scope, model_path):
         self.train_data_provider = train_data_provider
         self.batch_size = batch_size
         self.epochs = epochs
@@ -15,12 +15,14 @@ class Train():
         self.predictions = predictions
         self.save_path = save_path
         self.scope = scope
-        self.ckpt_path = './ckpt/multi/multi_model.ckpt'
+        self.ckpt_path = model_path
 
     def start_training(self):
         g = tf.Graph()
         with g.as_default():
             tf.set_random_seed(3)  # set random seed for initialization
+
+            steps = tf.Variable(0, trainable=False)
 
             self.train_data_provider.get_batch()
 
@@ -34,15 +36,18 @@ class Train():
             train_prediction = self.predictions(frames, self.scope)
             loss = tf.nn.softmax_cross_entropy_with_logits(logits=train_prediction, labels=labels)
             cross_entropy_mean = tf.reduce_mean(loss, name='cross_entropy')
-            optimizer = tf.train.AdamOptimizer(self.learning_rate).minimize(cross_entropy_mean)
+            optimizer = tf.train.AdamOptimizer(self.learning_rate).minimize(cross_entropy_mean, global_step=steps)
 
-            saver = tf.train.Saver()
+            saver = tf.train.Saver(max_to_keep=50)
 
         with tf.Session(graph=g) as sess:
             train_num_batches = int(self.train_sample_num / self.batch_size)
-            #sess.run(tf.global_variables_initializer())
-            saver.restore(sess, self.ckpt_path)
-            print("Model restored.")
+            if self.ckpt_path == 'None':
+                sess.run(tf.global_variables_initializer())
+                print("No Model restored.")
+            else:
+                saver.restore(sess, self.ckpt_path)
+                print("Model restored.")
 
             for epoch in range(self.epochs):
                 print('\n Start Training for epoch {}\n'.format(epoch + 1))
@@ -54,6 +59,7 @@ class Train():
                     print("Epoch {}/{}: Batch {}/{}: loss = {:.4f} ({:.2f} sec/step)".format(
                         epoch + 1, self.epochs, batch + 1, train_num_batches, loss_value, time_step))
 
+                save_path = saver.save(sess, self.ckpt_path, global_step=steps)
+                print("Model saved in path: %s" % save_path)
+
             print('\n Training Completed \n')
-            save_path = saver.save(sess, self.save_path)
-            print("Model saved in path: %s" % save_path)
