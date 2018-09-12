@@ -13,12 +13,13 @@ from models.rnn import RNN
 from models.fc import FC
 from models.attention import Attention
 from evaluation import Evaluation
+from analysis import Analysis
 
 class EMTAN():
 
     def __init__(self):
         # operation parameter
-        self.operation = 'training'
+        self.operation = 'multi_attention_analysis'
         # data source parameters
         self.arousal_train_tfrecords = './data/arousal/train_set.tfrecords'
         self.arousal_validate_tfrecords = './data/arousal/validate_set.tfrecords'
@@ -221,6 +222,57 @@ class EMTAN():
             outputs = fc.create_model(rnn_output, scope + '_fc')
         return outputs
 
+    def get_multi_attention(self, frames):
+        frames = self._reshape_to_conv(frames)
+        cnn = CNN()
+        if self.operation == 'training':
+            cnn_output = cnn.create_model(frames, cnn.conv_filters, keep_prob=self.keep_prob)
+        else:
+            cnn_output = cnn.create_model(frames, cnn.conv_filters, keep_prob=1.0)
+        cnn_output = self._reshape_to_rnn(cnn_output)
+        rnn = RNN()
+        arousal_rnn_output = rnn.create_model(cnn_output, 'arousal_rnn')
+        valence_rnn_output = rnn.create_model(cnn_output, 'valence_rnn')
+        dominance_rnn_output = rnn.create_model(cnn_output, 'dominance_rnn')
+        if self.is_attention:
+            attention = Attention(self.batch_size)
+            arousal_attention_output = attention.attention_analysis(arousal_rnn_output, 'arousal_attention')
+            valence_attention_output = attention.attention_analysis(valence_rnn_output, 'valence_attention')
+            dominance_attention_output = attention.attention_analysis(dominance_rnn_output, 'dominance_attention')
+            return arousal_attention_output, valence_attention_output, dominance_attention_output
+        else:
+            arousal_rnn_output = arousal_rnn_output[:, -1, :]
+            valence_rnn_output = valence_rnn_output[:, -1, :]
+            dominance_rnn_output = dominance_rnn_output[:, -1, :]
+            fc = FC(self.num_classes)
+            arousal_fc_outputs = fc.create_model(arousal_rnn_output, 'arousal_fc')
+            valence_fc_outputs = fc.create_model(valence_rnn_output, 'valence_fc')
+            dominance_fc_outputs = fc.create_model(dominance_rnn_output, 'dominance_fc')
+            return arousal_fc_outputs, valence_fc_outputs, dominance_fc_outputs
+
+    def multi_attention_analysis(self):
+        self.get_multi_validation_data_provider()
+        predictions = self.get_multi_attention
+        analysis = Analysis(self.multi_validation_data_provider, 1, 1,self.num_classes, self.learning_rate, predictions)
+        analysis.start_evaluation()
+
+    def multi_get_attention(self, frames):
+        frames = self._reshape_to_conv(frames)
+        cnn = CNN()
+        cnn_output = cnn.create_model(frames, cnn.conv_filters)
+        cnn_output = self._reshape_to_rnn(cnn_output)
+        rnn = RNN()
+        rnn_output = rnn.create_model(cnn_output)
+        if self.is_attention:
+            attention = Attention(self.batch_size)
+            attention_output = attention.attention_analysis(rnn_output)
+            return attention_output
+        else:
+            rnn_output = rnn_output[:, -1, :]
+            fc = FC(self.num_classes)
+            outputs = fc.create_model(rnn_output)
+            return outputs
+
 
 def main():
     net = EMTAN()
@@ -255,6 +307,9 @@ def main():
             net.valence_validation()
         elif net.is_dominance:
             net.dominance_validation()
+    elif net.operation == 'multi_attention_analysis':
+        if net.is_multi:
+            net.multi_attention_analysis()
 
 if __name__ == '__main__':
     main()

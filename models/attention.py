@@ -35,3 +35,22 @@ class Attention:
                                 trainable=True)
             outputs = self.loop_inputs(inputs, u)
         return outputs
+
+    def attention_analysis(self, inputs, scope):
+        with tf.variable_scope(scope):
+            u = tf.get_variable('u', shape=(128, 1),initializer=tf.random_uniform_initializer(),dtype=tf.float32,
+                                trainable=True)
+            u_var = self.loop_inputs_analysis(inputs, u)
+        return u_var
+
+    def loop_inputs_analysis(self,inputs, u):
+        softmax = 0
+        for i in range(self.batch_size):
+            softmax = self.attention_process_analysis(inputs[i], u)
+        return softmax
+
+    def attention_process_analysis(self, input, u):
+        # input size is ? * 128
+        u_y = tf.matmul(input, u, name='u_y')
+        softmax = tf.nn.softmax(u_y, dim=0)
+        return softmax

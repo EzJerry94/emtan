@@ -13,7 +13,7 @@ class MultiDataProvider():
         dataset = dataset.map(self.parse_example)
         if self.is_shuffle:
             dataset = dataset.shuffle(buffer_size=10000)
-        padded_shapes = ([None], [1], [1], [1])
+        padded_shapes = ([None], [1], [1], [1], [])
         self.dataset = dataset.padded_batch(self.batch_size, padded_shapes=padded_shapes)
 
     def parse_example(self, serialized_example):
@@ -32,10 +32,11 @@ class MultiDataProvider():
         arousal = features['arousal']
         valence = features['valence']
         dominance = features['dominance']
+        file = features['file']
 
         frame = tf.decode_raw(frame, tf.float32)
         arousal = tf.decode_raw(arousal, tf.int32)
         valence = tf.decode_raw(valence, tf.int32)
         dominance = tf.decode_raw(dominance, tf.int32)
 
-        return frame, arousal, valence, dominance
+        return frame, arousal, valence, dominance, file
